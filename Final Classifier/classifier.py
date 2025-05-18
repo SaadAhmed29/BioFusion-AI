@@ -10,8 +10,9 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import LogisticRegression
 import seaborn as sns
 import matplotlib.pyplot as plt
 from transformers import AutoTokenizer, AutoModel
@@ -114,6 +115,24 @@ all_mamm_feats = np.vstack(all_mamm_feats)
 all_ultra_feats = np.vstack(all_ultra_feats)
 all_labels = np.hstack(all_labels)
 
+# Load CSV metadata
+meta_df = pd.read_csv('/content/drive/MyDrive/meta_data.csv')
+
+# Keep only relevant columns
+meta_df = meta_df[['breast_density', 'mass shape', 'mass margins', 'subtlety']]
+
+# One-hot encode categorical features
+categorical_cols = ['breast_density', 'mass shape', 'mass margins']
+one_hot_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
+encoded_cat = one_hot_encoder.fit_transform(meta_df[categorical_cols])
+
+# Normalize subtlety (ordinal)
+scaler = StandardScaler()
+subtlety_scaled = scaler.fit_transform(meta_df[['subtlety']])
+
+# Combine all structured features
+structured_feats = np.concatenate([encoded_cat, subtlety_scaled], axis=1)
+
 
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -132,6 +151,9 @@ X_mamm_test  = all_mamm_feats[test_idx]
 
 X_ultra_train = all_ultra_feats[train_idx]
 X_ultra_test  = all_ultra_feats[test_idx]
+
+structured_train = structured_feats[train_idx]
+structured_test = structured_feats[test_idx]
 
 y_train = y_all[train_idx]
 y_test  = y_all[test_idx]
@@ -159,13 +181,12 @@ X_ultra_train = pca_ultra.transform(X_ultra_train)
 X_ultra_test  = pca_ultra.transform(X_ultra_test)
 
 
-X_train_final = np.concatenate([X_mamm_train, X_ultra_train], axis=1)
-X_test_final  = np.concatenate([X_mamm_test,  X_ultra_test],  axis=1)
+X_train_final = np.concatenate([X_mamm_train, X_ultra_train, structured_train], axis=1)
+X_test_final  = np.concatenate([X_mamm_test,  X_ultra_test, structured_test],  axis=1)
 
 print(X_train_final.shape)
 print(X_test_final.shape)
 
-from sklearn.linear_model import LogisticRegression
 
 clf=LogisticRegression(max_iter=1000)
 clf.fit(X_train_final, y_train)
@@ -197,4 +218,10 @@ dump(pca_mamm, 'pca_mamm.pkl')
 dump(pca_ultra, 'pca_ultra.pkl')
 
 # Save Final Classifier Model
-dump(clf, 'final_classifier.pkl')
+dump(clf, 'final_classifier_model.pkl')
+
+# Save OHE
+dump(one_hot_encoder, 'onehot_encoder.pkl')
+
+# Save Scaler for metadata
+dump(scaler, 'scaler_subtlety.pkl')
