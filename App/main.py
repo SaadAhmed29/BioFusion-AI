@@ -18,7 +18,7 @@ pca_mamm = load(r'BioFusion-AI\models\pca_mamm.pkl')
 pca_ultra = load(r'BioFusion-AI\models\pca_ultra.pkl')
 
 # Load Final Classifier
-classifier_model = load(r'BioFusion-AI\models\random_forest.pkl')
+classifier_model = load(r'BioFusion-AI\models\GB_classifier_model.pkl')
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -74,39 +74,50 @@ def getFeatures(mamm,ult,mam_model,ult_model,s_mamm,s_ultra,pc_mamm,pc_ultra,str
 
 
 # Load trained one-hot encoder and scaler
-ohe = load(r"BioFusion-AI\models\onehot_encoder.pkl")       # Fitted on training data
-scaler_sub = load(r"BioFusion-AI\models\scaler_subtlety.pkl")  # Fitted StandardScaler
+ohe = load(r"BioFusion-AI\models\onehot_encod.pkl")       # Fitted on training data
+scaler_sub = load(r"BioFusion-AI\models\numeric_scaler.pkl")  # Fitted StandardScaler
 
 
 #FUNCTION TO PROCESS THE 4 ADDITIONAL FEATURES
-def process_structured_input(metadata_dict, onehot, scaler):
-    # Create DataFrame for encoding
-    df_cat = pd.DataFrame([{
-        "breast_density": metadata_dict["breast_density"],
-        "mass shape": metadata_dict["mass shape"],
-        "mass margins": metadata_dict["mass margins"]
-    }])
+def process_structured_input(metadata_dict, onehot, scaler_sb):
+    # Define columns to extract in correct order
+    categorical_cols = [
+        'breast_density', 'mass shape', 'mass margins',
+        'family_history', 'hormone_therapy', 'previous_biopsy',
+        'breastfeeding', 'breast_pain', 'brca_mutation_status'
+    ]
 
-    # One-hot encode
+    numeric_cols = ['subtlety', 'age', 'bmi']
+
+    # Prepare DataFrames
+    df_cat = pd.DataFrame([{key: metadata_dict[key] for key in categorical_cols}])
+    df_num = np.array([[metadata_dict[key] for key in numeric_cols]])
+
+    # Transform
     encoded_cat = onehot.transform(df_cat)
-
-    # Scale subtlety
-    subtlety_val = np.array([[metadata_dict["subtlety"]]])  
-    subtlety_scaled = scaler.transform(subtlety_val)        
+    scaled_num = scaler_sb.transform(df_num)
 
     # Combine
-    structured_vector = np.concatenate([encoded_cat, subtlety_scaled], axis=1).squeeze()
+    structured_vector = np.concatenate([encoded_cat, scaled_num], axis=1).squeeze()
 
     return structured_vector
 
-new_metadata = {
+sample = {
     "breast_density": 3,
-    "mass shape": "ARCHITECTURAL_DISTORTION",
-    "mass margins": "ILL_DEFINED",
-    "subtlety": 3
+    "mass shape": "ROUND",
+    "mass margins": "CIRCUMSCRIBED",
+    "family_history": "Yes",
+    "hormone_therapy": "No",
+    "previous_biopsy": "Yes",
+    "breastfeeding": "No",
+    "breast_pain": "Yes",
+    "brca_mutation_status": "Negative",
+    "subtlety": 4,
+    "age": 55,
+    "bmi": 27.6
 }
 
-vector = process_structured_input(new_metadata,ohe,scaler_sub)
+vector = process_structured_input(sample,ohe,scaler_sub)
 print(vector.shape)
 
 
