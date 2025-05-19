@@ -18,7 +18,7 @@ pca_mamm = load(r'BioFusion-AI\models\pca_mamm.pkl')
 pca_ultra = load(r'BioFusion-AI\models\pca_ultra.pkl')
 
 # Load Final Classifier
-classifier_model = load(r'BioFusion-AI\models\final_classifier_model.pkl')
+classifier_model = load(r'BioFusion-AI\models\random_forest.pkl')
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

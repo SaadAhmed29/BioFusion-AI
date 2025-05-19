@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.metrics import confusion_matrix
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 import seaborn as sns
 import matplotlib.pyplot as plt
 from transformers import AutoTokenizer, AutoModel
@@ -188,15 +188,15 @@ print(X_train_final.shape)
 print(X_test_final.shape)
 
 
-clf=LogisticRegression(max_iter=1000)
-clf.fit(X_train_final, y_train)
+RF=RandomForestClassifier()
+RF.fit(X_train_final, y_train)
 
-y_pred = clf.predict(X_test_final)
+rfy_pred = RF.predict(X_test_final)
 
-accuracy=accuracy_score(y_test, y_pred)
-precision=precision_score(y_test, y_pred)
-recall=recall_score(y_test, y_pred)
-f1=f1_score(y_test, y_pred)
+accuracy=accuracy_score(y_test, rfy_pred)
+precision=precision_score(y_test, rfy_pred)
+recall=recall_score(y_test, rfy_pred)
+f1=f1_score(y_test, rfy_pred)
 
 print("EVALUATION METRICS:")
 print("Accuracy: ", accuracy)
@@ -204,9 +204,8 @@ print("Precision: ", precision)
 print("Recall: ", recall)
 print("F1 Score: ", f1)
 
-
 # CONFUSION MATRIX
-cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, rfy_pred)
 sns.heatmap(cm, annot=True, fmt='d')
 
 # Save Scalers
@@ -218,7 +217,7 @@ dump(pca_mamm, 'pca_mamm.pkl')
 dump(pca_ultra, 'pca_ultra.pkl')
 
 # Save Final Classifier Model
-dump(clf, 'final_classifier_model.pkl')
+dump(RF, 'random_forest.pkl')
 
 # Save OHE
 dump(one_hot_encoder, 'onehot_encoder.pkl')
