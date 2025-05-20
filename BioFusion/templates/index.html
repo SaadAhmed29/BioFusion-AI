@@ -1,56 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bootstrap Starter</title>
-  
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-ENjdO4Dr2bkBIFxQpeoW/UG7c45j6E/h6fYZZzFZZj1G5VzQ5F5d4iXb+M42W9jk"
-    crossorigin="anonymous"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap Webpage with Image Inputs and Dropdowns</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4"><b>BioFusion-AI</b></h2>
   
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">MySite</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-        </ul>
-      </div>
+  <div class="row mb-4">
+    <!-- Image Input 1 -->
+    <div class="col-md-6">
+      <label for="image1" class="form-label">Mammogram</label>
+      <input class="form-control" type="file" id="image1" accept="image/*">
     </div>
-  </nav>
-  
-  <main class="container my-5">
-    <h1>Welcome to Bootstrap Starter!</h1>
-    <p>This is a clean starting point with Bootstrap 5.</p>
-    <button type="button" class="btn btn-primary">Click me</button>
-  </main>
-  
-  <!-- Bootstrap Bundle JS (includes Popper) -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-qQsi6X35F+jqN0AxYsZtC7s1sn+Nvy3pqX9lQZkN0z5yQ2KvzWV3uTwz1QzXT5ZB"
-    crossorigin="anonymous"
-  ></script>
+    <!-- Image Input 2 -->
+    <div class="col-md-6">
+      <label for="image2" class="form-label">Ultrasound</label>
+      <input class="form-control" type="file" id="image2" accept="image/*">
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <!-- Dropdown 1 -->
+    <div class="col-md-6">
+      <label for="dropdown1" class="form-label">Select Option 1</label>
+      <select class="form-select" id="dropdown1">
+        <option selected disabled>Choose...</option>
+        <option value="option1a">Option 1A</option>
+        <option value="option1b">Option 1B</option>
+        <option value="option1c">Option 1C</option>
+      </select>
+    </div>
+    <!-- Dropdown 2 -->
+    <div class="col-md-6">
+      <label for="dropdown2" class="form-label">Select Option 2</label>
+      <select class="form-select" id="dropdown2">
+        <option selected disabled>Choose...</option>
+        <option value="option2a">Option 2A</option>
+        <option value="option2b">Option 2B</option>
+        <option value="option2c">Option 2C</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button class="btn btn-primary">Submit</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
