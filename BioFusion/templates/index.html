@@ -1,49 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bootstrap Webpage with Image Inputs and Dropdowns</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BioFusion-AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
+<nav class="navbar navbar-expand-lg" style="background-color: #1b426c; padding: 3rem 2rem; ">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1 text-white" style="font-size: 3rem; te">BioFusion</span>
+  </div>
+</nav>
+
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4"><b>BioFusion-AI</b></h2>
-  
-  <div class="row mb-4">
-    <!-- Image Input 1 -->
-    <div class="col-md-6">
+  <!-- Image Upload -->
+  <h4 class="text-center mb-4 mt-7" style="color: #1b426c">Image Data</h4>
+
+  <div class="row mb-5 mt-3 py-4">
+    <div class="col-md-6 mb-3">
       <label for="image1" class="form-label">Mammogram</label>
-      <input class="form-control" type="file" id="image1" accept="image/*">
+      <input class="form-control" type="file" id="image1" accept="image/*" />
     </div>
-    <!-- Image Input 2 -->
-    <div class="col-md-6">
+    <div class="col-md-6 mb-3">
       <label for="image2" class="form-label">Ultrasound</label>
-      <input class="form-control" type="file" id="image2" accept="image/*">
+      <input class="form-control" type="file" id="image2" accept="image/*" />
+    </div>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <!-- Dropdowns -->
+   <h4 class="text-center mb-5 mt-6" style="color: #1b426c">Clinical Data</h4>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="breastDensity" class="form-label">Breast Density</label>
+      <select class="form-select" id="breastDensity">
+        <option disabled selected>Choose...</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label for="massShape" class="form-label">Mass Shape</label>
+      <select class="form-select" id="massShape">
+        <option disabled selected>Choose...</option>
+        <option>ARCHITECTURAL_DISTORTION</option>
+        <option>ASYMMETRIC_BREAST_TISSUE</option>
+        <option>FOCAL_ASYMMETRIC_DENSITY</option>
+        <option>IRREGULAR</option>
+        <option>IRREGULAR-ARCHITECTURAL_DISTORTION</option>
+        <option>IRREGULAR-FOCAL_ASYMMETRIC_DENSITY</option>
+        <option>LOBULATED</option>
+        <option>LOBULATED-ARCHITECTURAL_DISTORTION</option>
+        <option>LOBULATED-IRREGULAR</option>
+        <option>LOBULATED-OVAL</option>
+        <option>N/A</option>
+        <option>OVAL</option>
+        <option>ROUND</option>
+        <option>ROUND-OVAL</option>
+      </select>
     </div>
   </div>
 
   <div class="row mb-4">
-    <!-- Dropdown 1 -->
     <div class="col-md-6">
-      <label for="dropdown1" class="form-label">Select Option 1</label>
-      <select class="form-select" id="dropdown1">
-        <option selected disabled>Choose...</option>
-        <option value="option1a">Option 1A</option>
-        <option value="option1b">Option 1B</option>
-        <option value="option1c">Option 1C</option>
+      <label for="massMargins" class="form-label">Mass Margins</label>
+      <select class="form-select" id="massMargins">
+        <option disabled selected>Choose...</option>
+        <option>CIRCUMSCRIBED</option>
+        <option>CIRCUMSCRIBED-ILL_DEFINED</option>
+        <option>CIRCUMSCRIBED-MICROLOBULATED</option>
+        <option>CIRCUMSCRIBED-OBSCURED</option>
+        <option>ILL_DEFINED</option>
+        <option>ILL_DEFINED-SPICULATED</option>
+        <option>MICROLOBULATED</option>
+        <option>MICROLOBULATED-ILL_DEFINED</option>
+        <option>MICROLOBULATED-ILL_DEFINED-SPICULATED</option>
+        <option>MICROLOBULATED-SPICULATED</option>
+        <option>N/A</option>
+        <option>OBSCURED</option>
+        <option>OBSCURED-ILL_DEFINED</option>
+        <option>OBSCURED-ILL_DEFINED-SPICULATED</option>
+        <option>OBSCURED-SPICULATED</option>
+        <option>SPICULATED</option>
       </select>
     </div>
-    <!-- Dropdown 2 -->
+
     <div class="col-md-6">
-      <label for="dropdown2" class="form-label">Select Option 2</label>
-      <select class="form-select" id="dropdown2">
-        <option selected disabled>Choose...</option>
-        <option value="option2a">Option 2A</option>
-        <option value="option2b">Option 2B</option>
-        <option value="option2c">Option 2C</option>
+      <label for="subtlety" class="form-label">Subtlety</label>
+      <select class="form-select" id="subtlety">
+        <option disabled selected>Choose...</option>
+        <option>0</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
       </select>
+    </div>
+  </div>
+
+  <!-- Radio Buttons Instead of Dropdowns -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label class="form-label d-block">Family History</label>
+      <div>
+        <input type="radio" name="familyHistory" value="Yes" /> Yes
+        <input type="radio" name="familyHistory" value="No" class="ms-3" /> No
+        
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label d-block">Hormone Therapy</label>
+      <div>
+        <input type="radio" name="hormoneTherapy" value="Yes" /> Yes
+        <input type="radio" name="hormoneTherapy" value="No" class="ms-3" /> No
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label class="form-label d-block">Previous Biopsy</label>
+      <div>
+        <input type="radio" name="previousBiopsy" value="Yes" /> Yes
+        <input type="radio" name="previousBiopsy" value="No" class="ms-3" /> No
+        
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label d-block">Breastfeeding</label>
+      <div>
+        <input type="radio" name="breastfeeding" value="Yes" /> Yes
+        <input type="radio" name="breastfeeding" value="No" class="ms-3" /> No
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label class="form-label d-block">BRCA Mutation Status</label>
+      <div>
+        <input type="radio" name="brcaStatus" value="Positive" /> Positive
+        <input type="radio" name="brcaStatus" value="Negative" class="ms-3" /> Negative
+        <input type="radio" name="brcaStatus" value="Unknown" class="ms-3" /> Unknown
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label d-block">Breast Pain</label>
+      <div>
+        <input type="radio" name="breastPain" value="Yes" /> Yes
+        <input type="radio" name="breastPain" value="No" class="ms-3" /> No
+      
+      </div>
+    </div>
+  </div>
+
+  <!-- Numeric Inputs -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="age" class="form-label">Age</label>
+      <input type="number" class="form-control" id="age" placeholder="Enter age" min="0" />
+    </div>
+
+    <div class="col-md-6">
+      <label for="bmi" class="form-label">BMI</label>
+      <input type="number" step="0.01" class="form-control" id="bmi" placeholder="Enter BMI" min="0" />
     </div>
   </div>
 
@@ -51,7 +184,7 @@
     <button class="btn btn-primary">Submit</button>
   </div>
 </div>
-
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
