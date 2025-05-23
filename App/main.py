@@ -9,16 +9,17 @@ import pandas as pd
 import numpy as np
 from joblib import load
 
+
 # Load Scalers
-scaler_mamm = load(r'BioFusion-AI\models\scaler_mamm.pkl')
-scaler_ultra = load(r'BioFusion-AI\models\scaler_ultra.pkl')
+scaler_mamm = load(r'C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\scaler_mamm.pkl')
+scaler_ultra = load(r'C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\scaler_ultra.pkl')
 
 # Load PCA Transformers
-pca_mamm = load(r'BioFusion-AI\models\pca_mamm.pkl')
-pca_ultra = load(r'BioFusion-AI\models\pca_ultra.pkl')
+pca_mamm = load(r'C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\pca_mamm.pkl')
+pca_ultra = load(r'C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\pca_ultra.pkl')
 
 # Load Final Classifier
-classifier_model = load(r'BioFusion-AI\models\GB_classifier_model.pkl')
+classifier_model = load(r'C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\GB_classifier_model.pkl')
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -44,8 +45,8 @@ img_transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225])
 ])
 
-mamm_model = load_mobilenet_model(r"BioFusion-AI\models\mammogram_model.pth")
-ultra_model = load_mobilenet_model(r"BioFusion-AI\models\ultrasound_model.pth")
+mamm_model = load_mobilenet_model(r"C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\mammogram_model.pth")
+ultra_model = load_mobilenet_model(r"C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\ultrasound_model.pth")
 
 
 #FEATURE EXTRACTION FUNCTIONS
@@ -74,8 +75,8 @@ def getFeatures(mamm,ult,mam_model,ult_model,s_mamm,s_ultra,pc_mamm,pc_ultra,str
 
 
 # Load trained one-hot encoder and scaler
-ohe = load(r"BioFusion-AI\models\onehot_encod.pkl")       # Fitted on training data
-scaler_sub = load(r"BioFusion-AI\models\numeric_scaler.pkl")  # Fitted StandardScaler
+ohe = load(r"C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\onehot_encod.pkl")       # Fitted on training data
+scaler_sub = load(r"C:\Users\Natasha\Desktop\BioFusion\BioFusion-AI\models\numeric_scaler.pkl")  # Fitted StandardScaler
 
 
 #FUNCTION TO PROCESS THE 4 ADDITIONAL FEATURES
