@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import torch
 import torch.nn as nn
@@ -9,16 +10,15 @@ import pandas as pd
 import numpy as np
 from joblib import load
 
-# Load Scalers
-scaler_mamm = load(r'BioFusion-AI\models\scaler_mamm.pkl')
-scaler_ultra = load(r'BioFusion-AI\models\scaler_ultra.pkl')
+BASE_DIR = Path(__file__).resolve().parent  # Now points to core/
+MODELS_DIR = BASE_DIR / "models"  # Correct path: BioFusion-AI/core/models/
 
-# Load PCA Transformers
-pca_mamm = load(r'BioFusion-AI\models\pca_mamm.pkl')
-pca_ultra = load(r'BioFusion-AI\models\pca_ultra.pkl')
+scaler_mamm = load(MODELS_DIR / "scaler_mamm.pkl")
+scaler_ultra = load(MODELS_DIR / "scaler_ultra.pkl")
+pca_mamm = load(MODELS_DIR / "pca_mamm.pkl")
+pca_ultra = load(MODELS_DIR / "pca_ultra.pkl")
+classifier_model = load(MODELS_DIR / "GB_classifier_model.pkl")
 
-# Load Final Classifier
-classifier_model = load(r'BioFusion-AI\models\GB_classifier_model.pkl')
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -44,9 +44,8 @@ img_transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225])
 ])
 
-mamm_model = load_mobilenet_model(r"BioFusion-AI\models\mammogram_model.pth")
-ultra_model = load_mobilenet_model(r"BioFusion-AI\models\ultrasound_model.pth")
-
+mamm_model = load_mobilenet_model(str(MODELS_DIR / "mammogram_model.pth"))
+ultra_model = load_mobilenet_model(str(MODELS_DIR / "ultrasound_model.pth"))
 
 #FEATURE EXTRACTION FUNCTIONS
 
@@ -74,9 +73,8 @@ def getFeatures(mamm,ult,mam_model,ult_model,s_mamm,s_ultra,pc_mamm,pc_ultra,str
 
 
 # Load trained one-hot encoder and scaler
-ohe = load(r"BioFusion-AI\models\onehot_encod.pkl")       # Fitted on training data
-scaler_sub = load(r"BioFusion-AI\models\numeric_scaler.pkl")  # Fitted StandardScaler
-
+ohe = load(MODELS_DIR / "onehot_encod.pkl")
+scaler_sub = load(MODELS_DIR / "numeric_scaler.pkl")
 
 #FUNCTION TO PROCESS THE 4 ADDITIONAL FEATURES
 def process_structured_input(metadata_dict, onehot, scaler_sb):
@@ -122,8 +120,7 @@ print(vector.shape)
 
 
 
-#Take input mammogram and ultrasound
-#Take additional 4 inputs through dropdowns
+#Take inputs
 #Convert those in dictionary
 #pass through process_structured_input function to get its feature vector
 #Apply img_transform function on both images

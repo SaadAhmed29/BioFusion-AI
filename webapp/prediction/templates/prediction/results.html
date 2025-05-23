@@ -1,0 +1,119 @@
+{% extends "prediction/base.html" %}
+
+{% block title %}Results | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="diagnosis-card card mb-4 {{ results.diagnosis|lower }}">
+            <div class="card-header bg-white">
+                <h2 class="h4 mb-0">
+                    <i class="fas fa-diagnosis me-2"></i>
+                    Diagnosis Results
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="me-3">
+                                <span class="badge rounded-pill bg-{{ results.diagnosis|lower }} p-3">
+                                    {{ results.diagnosis|upper }}
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">{{ results.probability|floatformat:2 }}%</h3>
+                                <small class="text-muted">Probability of Malignancy</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Confidence:</span>
+                                <strong class="text-{{ results.confidence|lower }}">
+                                    {{ results.confidence }}
+                                </strong>
+                            </div>
+                            <div class="progress probability-meter">
+                                <div class="progress-bar bg-{{ results.diagnosis|lower }}" 
+                                     role="progressbar" 
+                                     style="width: {{ results.probability }}%"
+                                     aria-valuenow="{{ results.probability }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5 class="mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Key Clinical Indicators
+                        </h5>
+                        <ul class="list-group list-group-flush">
+                            {% for key, value in results.key_indicators.items %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ key|title }}:</span>
+                                <strong>{{ value }}</strong>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Results Tabs -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <ul class="nav nav-pills card-header-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="pill" href="#imaging">
+                            <i class="fas fa-image me-2"></i>
+                            Imaging Findings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="pill" href="#clinical">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Clinical Factors
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body tab-content">
+                <div class="tab-pane fade show active" id="imaging">
+                    <!-- Imaging findings content -->
+                </div>
+                <div class="tab-pane fade" id="clinical">
+                    <!-- Clinical factors content -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+            <a href="{% url 'diagnosis_view' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-redo me-2"></i>
+                New Analysis
+            </a>
+            <button class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-file-pdf me-2"></i>
+                Export PDF
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+{% endblock %}
