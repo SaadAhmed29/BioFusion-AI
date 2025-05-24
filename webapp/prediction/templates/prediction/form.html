@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container mt-4">
     <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h2 class="mb-0">
+        <div class="card-header navbar-brand bg-primary-custom text-white">
+            <h2 class="mb-0" style="font-size: 1.5rem;">
                 <i class="fas fa-clipboard-check me-2"></i>
                 Breast Cancer Risk Assessment
             </h2>
@@ -22,7 +22,7 @@
                                 {{ form.mammogram.label }}
                             </label>
                             {{ form.mammogram }}
-                            <div class="form-text">Upload mammogram DICOM or JPEG image</div>
+                            <div class="form-text">Upload mammogram PNG or JPEG image</div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -39,7 +39,7 @@
 
                 <!-- Clinical Features Section -->
                 <div class="card mb-4 border-primary">
-                    <div class="card-header bg-light">
+                    <div class="card-header navbar-brand bg-primary-custom text-white">
                         <h3 class="h5 mb-0">
                             <i class="fas fa-notes-medical me-2"></i>
                             Clinical Features
@@ -87,7 +87,7 @@
 
                 <!-- Patient History Section -->
 <div class="card mb-4 border-primary">
-    <div class="card-header bg-light">
+    <div class="card-header navbar-brand bg-primary-custom text-white">
         <h3 class="h5 mb-0">
             <i class="fas fa-history me-2"></i>
             Patient History
@@ -185,7 +185,7 @@
 </div>
                 <!-- Demographic Information -->
                 <div class="card mb-4 border-primary">
-                    <div class="card-header bg-light">
+                    <div class="card-header navbar-brand bg-primary-custom text-white">
                         <h3 class="h5 mb-0">
                             <i class="fas fa-user-circle me-2"></i>
                             Demographic Information
@@ -215,7 +215,7 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn-primary btn-lg bg-primary-custom button-text">
                         <i class="fas fa-diagnosis me-2"></i>
                         Submit for Analysis
                     </button>
@@ -240,6 +240,7 @@
     }
     
     .border-primary {
+        border-color: #00254d !important;
         border-width: 2px;
     }
 </style>

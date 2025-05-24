@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="diagnosis-card card mb-4 {{ results.diagnosis|lower }}">
-            <div class="card-header bg-white">
+            <div class="card-header navbar-brand bg-primary-custom text-white">
                 <h2 class="h4 mb-0">
                     <i class="fas fa-diagnosis me-2"></i>
                     Diagnosis Results
@@ -22,62 +22,69 @@
                         </div>
                         <div>
                             <h3 class="mb-1">{{ results.probability|floatformat:2 }}%</h3>
-                            <p class="mb-0 text-muted">Probability {{ results.probability_type }}</p>
-                            <p class="mb-0">
-                                Confidence: 
-                                <span class="badge bg-{{ results.confidence|lower }}">
-                                    {{ results.confidence }}
-                                </span>
-                            </p>
+                            <p class="mb-0 text-muted">Probability of {{ results.diagnosis|lower }} diagnosis</p>
                         </div>
                     </div>
                     
-                    <div class="progress probability-meter mb-4">
-                        <div class="progress-bar bg-{{ results.diagnosis|lower }}" 
+                    <div class="progress probability-meter mb-4 b">
+                        <div class="progress-bar bg-{{ results.diagnosis|lower }} bg-primary-custom" 
                              role="progressbar" 
                              style="width: {{ results.probability }}%"
                              aria-valuenow="{{ results.probability }}" 
                              aria-valuemin="0" 
                              aria-valuemax="100">
+                            {{ results.probability|floatformat:1 }}%
                         </div>
+                    </div>
+                    
+                    <div class="alert alert-{{ results.diagnosis|lower }}">
+                        <i class="fas fa-info-circle me-2"></i>
+                        The analysis indicates a <strong>{{ results.diagnosis }}</strong> condition
+                        with <strong>{{ results.probability|floatformat:1 }}%</strong> confidence.
                     </div>
                 </div>
 
-                <div class="key-factors">
+                {% if results.input_data %}
+                <div class="key-factors mt-5">
                     <h5 class="mb-3">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Clinical Indicators
+                        <i class="fas fa-chart-line me-2"></i>
+                        Key Clinical Factors
                     </h5>
-                    <ul class="list-group list-group-flush">
+                    <div class="row">
                         {% for key, value in results.input_data.items %}
-                            {% if key not in ['mammogram', 'ultrasound'] %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>{{ key|title }}:</span>
-                                <span class="badge bg-primary rounded-pill">
-                                    {% if value == 'yes' %}
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    {% elif value == 'no' %}
-                                        <i class="fas fa-times-circle text-danger"></i>
-                                    {% else %}
-                                        {{ value }}
-                                    {% endif %}
-                                </span>
-                            </li>
-                            {% endif %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card factor-card h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ key|title }}</h6>
+                                        <p class="card-text">
+                                            <span class="badge bg-{{ value|yesno:'success,danger,primary' }}">
+                                                {% if value == 'yes' %}
+                                                    <i class="fas fa-check-circle me-1"></i> Present
+                                                {% elif value == 'no' %}
+                                                    <i class="fas fa-times-circle me-1"></i> Absent
+                                                {% else %}
+                                                    {{ value }}
+                                                {% endif %}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
+                {% endif %}
             </div>
         </div>
 
         <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
-            <a href="{% url 'diagnosis_view' %}" class="btn btn-primary btn-lg">
+            <a href="{% url 'diagnosis_view' %}" class="btn btn-primary btn-lg px-4 bg-primary-custom">
                 <i class="fas fa-redo me-2"></i>
-                New Analysis
+                Perform New Analysis
             </a>
-            <button class="btn btn-outline-secondary btn-lg">
-                <i class="fas fa-file-pdf me-2"></i>
-                Export PDF
+            <button class="btn btn-outline-secondary btn-lg px-4">
+                <i class="fas fa-file-medical me-2"></i>
+                Generate Clinical Report
             </button>
         </div>
     </div>
@@ -87,23 +94,28 @@
 {% block styles %}
 <style>
     .probability-meter {
-        height: 25px;
-        border-radius: 12px;
+        height: 30px;
+        border-radius: 15px;
+        font-weight: bold;
     }
-    .badge.bg-malignant {
-        background-color: #dc3545;
-        color: white;
+    .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
     }
-    .badge.bg-benign {
-        background-color: #28a745;
-        color: white;
+    .diagnosis-card.malignant {
+        border-left: 4px solid #dc3545;
     }
-    .badge.bg-high {
-        background-color: #17a2b8;
+    .diagnosis-card.benign {
+        border-left: 4px solid #28a745;
     }
-    .badge.bg-medium {
-        background-color: #ffc107;
-        color: #212529;
+    .factor-card {
+        transition: transform 0.2s;
+    }
+    .factor-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 </style>
 {% endblock %}

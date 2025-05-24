@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .forms import MedicalDiagnosisForm
 from PIL import Image
 import numpy as np
-from core.services import (  # Make sure these imports match your actual functions
+from core.services import ( 
     process_structured_input,
     getFeatures,
     mamm_model,
@@ -41,7 +41,7 @@ def diagnosis_view(request):
                 
                 struct_vector = process_structured_input(
                     structured_data,
-                    ohe,  # Make sure these are imported/available
+                    ohe,  
                     scaler_sub
                 )
 
@@ -86,13 +86,15 @@ def diagnosis_view(request):
                     probability_type = 'of being benign'
 
                 # Prepare results
+                # Prepare results
                 results = {
                     'probability': probability_display,
                     'probability_type': probability_type,
                     'diagnosis': diagnosis,
                     'confidence': 'High' if proba > 0.7 or proba < 0.3 else 'Medium',
-                    'input_data': structured_data
+                    'input_data': {k: v for k, v in structured_data.items()}  # Clean dict: no need to filter images here
                 }
+
                 
                 print(f"\n=== Prediction Results ===")
                 print(f"Diagnosis: {diagnosis}")
@@ -103,20 +105,19 @@ def diagnosis_view(request):
                 return render(request, 'prediction/results.html', {'results': results})
             
             except Exception as e:
-                print("Prediction Error:", str(e))
-                return render(request, 'prediction/form.html', {
-                    'form': form,
-                    'error': "Analysis failed. Please try again."
+                print(f"Prediction Error: {str(e)}")
+                return render(request, 'prediction/results.html', {
+                    'results': {
+                        'error': f"Analysis failed: {str(e)}",
+                        'diagnosis': 'Error',
+                        'probability': None
+                    }
                 })
-            
-            
         
-        else:
-            print("Form errors:", form.errors)
-            return render(request, 'prediction/form.html', {'form': form})
-    
-    else:
-        form = MedicalDiagnosisForm()
+        # Form is invalid
         return render(request, 'prediction/form.html', {'form': form})
+
+    form = MedicalDiagnosisForm()
+    return render(request, 'prediction/form.html', {'form': form})
     
 

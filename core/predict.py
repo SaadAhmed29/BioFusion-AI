@@ -1,4 +1,5 @@
 # core/predict.py
+from PIL import Image
 from .services import (
     img_transform,
     mamm_model,
@@ -13,40 +14,53 @@ from .services import (
 )
 
 def make_prediction(form_data, mammogram_file=None, ultrasound_file=None):
-    """
-    Main prediction pipeline
-    Args:
-        form_data: Dictionary from Django form
-        mammogram_file: UploadedFile object
-        ultrasound_file: UploadedFile object
-    Returns:
-        Dictionary of results
-    """
-    # 1. Process structured data
-    struct_vector = process_structured_input(form_data)
-    
-    # 2. Process images if provided
-    mamm_tensor = img_transform(Image.open(mammogram_file).convert('RGB')) if mammogram_file else None
-    ultra_tensor = img_transform(Image.open(ultrasound_file).convert('RGB')) if ultrasound_file else None
-    
-    # 3. Get combined features
-    features = getFeatures(
-        mamm_tensor, 
-        ultra_tensor,
-        mamm_model,
-        ultra_model,
-        scaler_mamm,
-        scaler_ultra,
-        pca_mamm,
-        pca_ultra,
-        struct_vector.reshape(1, -1)
-    )
-    
-    # 4. Make prediction
-    proba = classifier_model.predict_proba(features)[0][1]
-    
-    return {
-        'probability': float(proba * 100),
-        'diagnosis': 'Malignant' if proba > 0.5 else 'Benign',
-        'confidence': 'High' if proba > 0.7 or proba < 0.3 else 'Medium'
-    }
+    try:
+        # 1. Process structured data
+        struct_vector = process_structured_input(form_data)
+        
+        # 2. Process images if provided
+        mamm_tensor = None
+        ultra_tensor = None
+        
+        if mammogram_file:
+            mamm_img = Image.open(mammogram_file).convert('RGB')
+            mamm_tensor = img_transform(mamm_img).unsqueeze(0)  # Add batch dimension
+            
+        if ultrasound_file:
+            ultra_img = Image.open(ultrasound_file).convert('RGB')
+            ultra_tensor = img_transform(ultra_img).unsqueeze(0)
+        
+        # 3. Get combined features
+        features = getFeatures(
+            mamm_tensor, 
+            ultra_tensor,
+            mamm_model,
+            ultra_model,
+            scaler_mamm,
+            scaler_ultra,
+            pca_mamm,
+            pca_ultra,
+            struct_vector.reshape(1, -1)  # Ensure 2D array
+        )
+        
+        proba = classifier_model.predict_proba(features)[0]
+        malignant_prob = proba[1]  # Assuming class 1 is malignant
+        benign_prob = proba[0]     # Class 0 is benign
+        
+        if malignant_prob > 0.5:
+            return {
+                'diagnosis': 'Malignant',
+                'probability': float(malignant_prob * 100)
+            }
+        else:
+            return {
+                'diagnosis': 'Benign', 
+                'probability': float(benign_prob * 100)
+            }
+        
+    except Exception as e:
+        return {
+            'error': str(e),
+            'diagnosis': 'Error',
+            'probability': None
+        }
