@@ -64,8 +64,8 @@ def getFeatures(mamm,ult,mam_model,ult_model,s_mamm,s_ultra,pc_mamm,pc_ultra,str
   mamm_feat = s_mamm.transform(mamm_feat)
   ultra_feat = s_ultra.transform(ultra_feat)
 
-  mamm_feats = pc_mamm.transform(mamm_feats)
-  ultra_feats = pc_ultra.transform(ultra_feats)
+  mamm_feats = pc_mamm.transform(mamm_feat)
+  ultra_feats = pc_ultra.transform(ultra_feat)
 
   merged_features = np.concatenate([mamm_feats, ultra_feats, struct_vector], axis=1)
 

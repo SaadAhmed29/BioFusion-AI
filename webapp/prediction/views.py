@@ -1,48 +1,122 @@
-# prediction/views.py
 from django.shortcuts import render
 from .forms import MedicalDiagnosisForm
-from core.predict import make_prediction
-import os
-from django.conf import settings
+from PIL import Image
+import numpy as np
+from core.services import (  # Make sure these imports match your actual functions
+    process_structured_input,
+    getFeatures,
+    mamm_model,
+    ultra_model,
+    scaler_mamm,
+    scaler_ultra,
+    pca_mamm,
+    pca_ultra,
+    classifier_model,
+    img_transform,
+    ohe,
+    scaler_sub
+)
 
-def handle_upload(file):
-    """Save uploaded file temporarily"""
-    os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
-    path = os.path.join(settings.MEDIA_ROOT, file.name)
-    with open(path, 'wb+') as dest:
-        for chunk in file.chunks():
-            dest.write(chunk)
-    return path
-
-# prediction/views.py
 def diagnosis_view(request):
-    print(f"\n{'='*50}\nNew Request: {request.method}\n{'='*50}")
-    
     if request.method == 'POST':
-        print("\nPOST DATA:", request.POST)
-        print("FILES:", request.FILES.keys())
-        
         form = MedicalDiagnosisForm(request.POST, request.FILES)
-        print("\nFORM VALID:", form.is_valid())
-        print("FORM ERRORS:", form.errors)
         
         if form.is_valid():
-            print("\nPROCESSING FORM...")
             try:
-                # Add temporary test results
-                test_results = {
-                    'probability': 82.5,
-                    'diagnosis': 'Malignant',
-                    'confidence': 'High',
-                    'debug': True
+                # 1. Process structured data
+                structured_data = {
+                    'breast_density': form.cleaned_data['breast_density'],
+                    'mass shape': form.cleaned_data['mass_shape'],
+                    'mass margins': form.cleaned_data['mass_margins'],
+                    'family_history': form.cleaned_data['family_history'],
+                    'hormone_therapy': form.cleaned_data['hormone_therapy'],
+                    'previous_biopsy': form.cleaned_data['previous_biopsy'],
+                    'breastfeeding': form.cleaned_data['breastfeeding'],
+                    'brca_mutation_status': form.cleaned_data['brca_mutation_status'],
+                    'breast_pain': form.cleaned_data['breast_pain'],
+                    'subtlety': form.cleaned_data['subtlety'],
+                    'age': form.cleaned_data['age'],
+                    'bmi': form.cleaned_data['bmi']
                 }
-                return render(request, 'prediction/results.html', {'results': test_results})
+                
+                struct_vector = process_structured_input(
+                    structured_data,
+                    ohe,  # Make sure these are imported/available
+                    scaler_sub
+                )
+
+                # 2. Process images
+                mamm_img = None
+                ultra_img = None
+                
+                if 'mammogram' in request.FILES:
+                    mamm_img = img_transform(
+                        Image.open(request.FILES['mammogram']).convert('RGB')
+                    ).unsqueeze(0)
+                
+                if 'ultrasound' in request.FILES:
+                    ultra_img = img_transform(
+                        Image.open(request.FILES['ultrasound']).convert('RGB')
+                    ).unsqueeze(0)
+
+                # 3. Get features and predict
+                features = getFeatures(
+                    mamm_img,
+                    ultra_img,
+                    mamm_model,
+                    ultra_model,
+                    scaler_mamm,
+                    scaler_ultra,
+                    pca_mamm,
+                    pca_ultra,
+                    struct_vector.reshape(1, -1)
+                )
+                
+                
+                proba = classifier_model.predict_proba(features)[0][1]  # Probability of malignancy
+
+                # Determine diagnosis and corresponding probability display
+                if proba > 0.5:
+                    diagnosis = 'Malignant'
+                    probability_display = float(proba * 100)
+                    probability_type = 'of malignancy'
+                else:
+                    diagnosis = 'Benign'
+                    probability_display = float((1 - proba) * 100)  # Convert to benign probability
+                    probability_type = 'of being benign'
+
+                # Prepare results
+                results = {
+                    'probability': probability_display,
+                    'probability_type': probability_type,
+                    'diagnosis': diagnosis,
+                    'confidence': 'High' if proba > 0.7 or proba < 0.3 else 'Medium',
+                    'input_data': structured_data
+                }
+                
+                print(f"\n=== Prediction Results ===")
+                print(f"Diagnosis: {diagnosis}")
+                print(f"Probability: {probability_display:.2f}% {probability_type}")
+                print(f"Confidence: {results['confidence']}")
+                print(f"Raw Malignancy Probability: {proba:.4f}")
+
+                return render(request, 'prediction/results.html', {'results': results})
+            
             except Exception as e:
-                print("ERROR:", str(e))
-                return render(request, 'prediction/form.html', {'form': form, 'error': str(e)})
+                print("Prediction Error:", str(e))
+                return render(request, 'prediction/form.html', {
+                    'form': form,
+                    'error': "Analysis failed. Please try again."
+                })
+            
+            
         
+        else:
+            print("Form errors:", form.errors)
+            return render(request, 'prediction/form.html', {'form': form})
+    
+    else:
+        form = MedicalDiagnosisForm()
         return render(request, 'prediction/form.html', {'form': form})
     
-    # GET request
-    form = MedicalDiagnosisForm()
-    return render(request, 'prediction/form.html', {'form': form})
+

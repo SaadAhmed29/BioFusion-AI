@@ -13,87 +13,64 @@
                 </h2>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="me-3">
-                                <span class="badge rounded-pill bg-{{ results.diagnosis|lower }} p-3">
-                                    {{ results.diagnosis|upper }}
-                                </span>
-                            </div>
-                            <div>
-                                <h3 class="mb-0">{{ results.probability|floatformat:2 }}%</h3>
-                                <small class="text-muted">Probability of Malignancy</small>
-                            </div>
+                <div class="diagnosis-result">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <span class="badge rounded-pill bg-{{ results.diagnosis|lower }} p-3">
+                                {{ results.diagnosis|upper }}
+                            </span>
                         </div>
-                        
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Confidence:</span>
-                                <strong class="text-{{ results.confidence|lower }}">
+                        <div>
+                            <h3 class="mb-1">{{ results.probability|floatformat:2 }}%</h3>
+                            <p class="mb-0 text-muted">Probability {{ results.probability_type }}</p>
+                            <p class="mb-0">
+                                Confidence: 
+                                <span class="badge bg-{{ results.confidence|lower }}">
                                     {{ results.confidence }}
-                                </strong>
-                            </div>
-                            <div class="progress probability-meter">
-                                <div class="progress-bar bg-{{ results.diagnosis|lower }}" 
-                                     role="progressbar" 
-                                     style="width: {{ results.probability }}%"
-                                     aria-valuenow="{{ results.probability }}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
-                                </div>
-                            </div>
+                                </span>
+                            </p>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <h5 class="mb-3">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Key Clinical Indicators
-                        </h5>
-                        <ul class="list-group list-group-flush">
-                            {% for key, value in results.key_indicators.items %}
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span>{{ key|title }}:</span>
-                                <strong>{{ value }}</strong>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                    <div class="progress probability-meter mb-4">
+                        <div class="progress-bar bg-{{ results.diagnosis|lower }}" 
+                             role="progressbar" 
+                             style="width: {{ results.probability }}%"
+                             aria-valuenow="{{ results.probability }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Detailed Results Tabs -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <ul class="nav nav-pills card-header-pills">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="pill" href="#imaging">
-                            <i class="fas fa-image me-2"></i>
-                            Imaging Findings
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#clinical">
-                            <i class="fas fa-clipboard-list me-2"></i>
-                            Clinical Factors
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body tab-content">
-                <div class="tab-pane fade show active" id="imaging">
-                    <!-- Imaging findings content -->
-                </div>
-                <div class="tab-pane fade" id="clinical">
-                    <!-- Clinical factors content -->
+
+                <div class="key-factors">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Clinical Indicators
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        {% for key, value in results.input_data.items %}
+                            {% if key not in ['mammogram', 'ultrasound'] %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ key|title }}:</span>
+                                <span class="badge bg-primary rounded-pill">
+                                    {% if value == 'yes' %}
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    {% elif value == 'no' %}
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
-        
-        <!-- Action Buttons -->
-        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
             <a href="{% url 'diagnosis_view' %}" class="btn btn-primary btn-lg">
                 <i class="fas fa-redo me-2"></i>
                 New Analysis
@@ -107,13 +84,26 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
-{{ block.super }}
-<script>
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
+{% block styles %}
+<style>
+    .probability-meter {
+        height: 25px;
+        border-radius: 12px;
+    }
+    .badge.bg-malignant {
+        background-color: #dc3545;
+        color: white;
+    }
+    .badge.bg-benign {
+        background-color: #28a745;
+        color: white;
+    }
+    .badge.bg-high {
+        background-color: #17a2b8;
+    }
+    .badge.bg-medium {
+        background-color: #ffc107;
+        color: #212529;
+    }
+</style>
 {% endblock %}
