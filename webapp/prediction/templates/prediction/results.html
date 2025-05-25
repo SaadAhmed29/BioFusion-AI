@@ -3,95 +3,155 @@
 {% block title %}Results | {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="diagnosis-card card mb-4 {{ results.diagnosis|lower }}">
-            <div class="card-header navbar-brand bg-primary-custom text-white">
-                <h2 class="h4 mb-0">
-                    <i class="fas fa-diagnosis me-2"></i>
-                    Diagnosis Results
-                </h2>
-            </div>
-            <div class="card-body">
-                <div class="diagnosis-result">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="me-3">
-                            <span class="badge rounded-pill bg-{{ results.diagnosis|lower }} p-3">
-                                {{ results.diagnosis|upper }}
-                            </span>
-                        </div>
-                        <div>
-                            <h3 class="mb-1">{{ results.probability|floatformat:2 }}%</h3>
-                            <p class="mb-0 text-muted">Probability of {{ results.diagnosis|lower }} diagnosis</p>
-                        </div>
-                    </div>
-                    
-                    <div class="progress probability-meter mb-4 b">
-                        <div class="progress-bar bg-{{ results.diagnosis|lower }} bg-primary-custom" 
-                             role="progressbar" 
-                             style="width: {{ results.probability }}%"
-                             aria-valuenow="{{ results.probability }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
-                            {{ results.probability|floatformat:1 }}%
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-{{ results.diagnosis|lower }}">
-                        <i class="fas fa-info-circle me-2"></i>
-                        The analysis indicates a <strong>{{ results.diagnosis }}</strong> condition
-                        with <strong>{{ results.probability|floatformat:1 }}%</strong> confidence.
-                    </div>
+<div id="report-content">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="diagnosis-card card mb-4 {{ results.diagnosis|lower }}">
+                <div class="card-header navbar-brand bg-primary-custom text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-diagnosis me-2"></i>
+                        Diagnosis Results
+                    </h2>
                 </div>
+                <div class="card-body">
+                    <div class="diagnosis-result">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="me-3">
+                                <span class="badge rounded-pill bg-{{ results.diagnosis|lower }} p-3">
+                                    {{ results.diagnosis|upper }}
+                                </span>
+                            </div>
+                            <div>
+                                <h3 class="mb-1">{{ results.probability|floatformat:2 }}%</h3>
+                                <p class="mb-0 text-muted">Probability of {{ results.diagnosis|lower }} diagnosis</p>
+                            </div>
+                        </div>
+                        
+                        <div class="progress probability-meter mb-4 b">
+                            <div class="progress-bar bg-{{ results.diagnosis|lower }} bg-primary-custom" 
+                                role="progressbar" 
+                                style="width: {{ results.probability }}%"
+                                aria-valuenow="{{ results.probability }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                                {{ results.probability|floatformat:1 }}%
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-{{ results.diagnosis|lower }}">
+                            <i class="fas fa-info-circle me-2"></i>
+                            The analysis indicates a <strong>{{ results.diagnosis }}</strong> condition
+                            with <strong>{{ results.probability|floatformat:1 }}%</strong> confidence.
+                        </div>
+                    </div>
 
-                {% if results.input_data %}
-                <div class="key-factors mt-5">
-                    <h5 class="mb-3">
-                        <i class="fas fa-chart-line me-2"></i>
-                        Key Clinical Factors
-                    </h5>
-                    <div class="row">
-                        {% for key, value in results.input_data.items %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card factor-card h-100">
-                                    <div class="card-body">
-                                        <h6 class="card-title">{{ key|title }}</h6>
-                                        <p class="card-text">
-                                            <span class="badge bg-{{ value|yesno:'success,danger,primary' }}">
-                                                {% if value == 'yes' %}
-                                                    <i class="fas fa-check-circle me-1"></i> Present
-                                                {% elif value == 'no' %}
-                                                    <i class="fas fa-times-circle me-1"></i> Absent
-                                                {% else %}
-                                                    {{ value }}
-                                                {% endif %}
-                                            </span>
-                                        </p>
+                    {% if results.input_data %}
+                    <div class="key-factors mt-5">
+                        <h5 class="mb-3">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Key Clinical Factors
+                        </h5>
+                        <div class="row">
+                            {% for key, value in results.input_data.items %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card factor-card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ key|title }}</h6>
+                                            <p class="card-text">
+                                                <span class="badge bg-{{ value|yesno:'success,danger,primary' }}">
+                                                    {% if value == 'yes' %}
+                                                        <i class="fas fa-check-circle me-1"></i> Present
+                                                    {% elif value == 'no' %}
+                                                        <i class="fas fa-times-circle me-1"></i> Absent
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                </span>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
-        </div>
 
-        <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
-            <a href="{% url 'diagnosis_view' %}" class="btn btn-primary btn-lg px-4 bg-primary-custom">
-                <i class="fas fa-redo me-2"></i>
-                Perform New Analysis
-            </a>
-            <button class="btn btn-outline-secondary btn-lg px-4">
-                <i class="fas fa-file-medical me-2"></i>
-                Generate Clinical Report
-            </button>
+            <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
+                <a href="{% url 'diagnosis_view' %}" class="btn btn-primary btn-lg px-4 bg-primary-custom">
+                    <i class="fas fa-redo me-2"></i>
+                    Perform New Analysis
+                </a>
+                <button class="btn btn-outline-secondary btn-lg px-4" onclick="downloadPDF()">
+                    <i class="fas fa-file-medical me-2"></i>
+                    Generate Clinical Report
+                </button>
+            </div>
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    function downloadPDF() {
+        // Get the original element
+        const originalElement = document.getElementById("report-content");
+        
+        // Create a deep clone of the element
+        const element = originalElement.cloneNode(true);
+        
+        // Remove the buttons container from the clone
+        const buttonsContainer = element.querySelector('.d-grid');
+        if (buttonsContainer) {
+            buttonsContainer.remove();
+        }
+        
+        // Create a temporary container for PDF generation
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.appendChild(element);
+        document.body.appendChild(tempContainer);
+        
+        const opt = {
+            filename: 'clinical_report.pdf',
+            margin: 10,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                logging: true,
+                useCORS: true,
+                allowTaint: true,
+                scrollX: 0,
+                scrollY: 0
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait' 
+            }
+        };
+
+        // Generate PDF
+        html2pdf()
+            .set(opt)
+            .from(element)
+            .save()
+            .then(() => {
+                // Clean up
+                tempContainer.remove();
+            })
+            .catch(err => {
+                console.error('PDF generation failed:', err);
+                tempContainer.remove();
+            });
+    }
+</script>
+
 {% endblock %}
 
 {% block styles %}
+
 <style>
     .probability-meter {
         height: 30px;
