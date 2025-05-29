@@ -22,21 +22,27 @@
                                 </span>
                             </div>
                             <div>
-                                <h3 class="mb-1">{{ results.probability|floatformat:2 }}%</h3>
+                                <h3 class="mb-1" id="probability-counter">0.00%</h3> <!-- Counter target -->
                                 <p class="mb-0 text-muted">Probability of {{ results.diagnosis|lower }} diagnosis</p>
                             </div>
                         </div>
                         
-                        <div class="progress probability-meter mb-4 b">
-                            <div class="progress-bar bg-{{ results.diagnosis|lower }} bg-primary-custom" 
-                                role="progressbar" 
-                                style="width: {{ results.probability }}%"
-                                aria-valuenow="{{ results.probability }}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="100">
-                                {{ results.probability|floatformat:1 }}%
+                        <div class="progress probability-meter mb-2 b">
+                            <div class="progress-bar bg-{{ results.diagnosis|lower }} bg-primary-custom"
+                                role="progressbar"
+                                style="width: 0%;"
+                                aria-valuenow="{{ results.probability }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                data-final-width="{{ results.probability }}">
                             </div>
                         </div>
+                        <div class="d-flex justify-content-end mb-4">
+                            <span class="badge bg-secondary">
+                                {{ results.probability|floatformat:1 }}%
+                            </span>
+                        </div>
+
                         
                         <div class="alert alert-{{ results.diagnosis|lower }}">
                             <i class="fas fa-info-circle me-2"></i>
@@ -91,67 +97,60 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
+    // Animate the probability counter and progress bar on page load
+    document.addEventListener("DOMContentLoaded", () => {
+        const probElement = document.getElementById("probability-counter");
+        const finalProb = parseFloat("{{ results.probability|floatformat:2 }}");
+
+        let current = 0;
+        const duration = 1500; // Duration of animation in ms
+        const fps = 60;
+        const step = finalProb / (duration / (1000 / fps));
+
+        const counterInterval = setInterval(() => {
+            current += step;
+            if (current >= finalProb) {
+                current = finalProb;
+                clearInterval(counterInterval);
+            }
+            probElement.textContent = current.toFixed(2) + "%";
+        }, 1000 / fps);
+
+        // Animate the progress bar
+        const progressBar = document.querySelector(".progress-bar");
+        setTimeout(() => {
+            progressBar.style.width = finalProb + "%";
+        }, 200); // Small delay to trigger CSS transition
+    });
+
+    // PDF generation script
     function downloadPDF() {
-        // Get the original element
         const originalElement = document.getElementById("report-content");
-        
-        // Create a deep clone of the element
         const element = originalElement.cloneNode(true);
-        
-        // Remove the buttons container from the clone
         const buttonsContainer = element.querySelector('.d-grid');
-        if (buttonsContainer) {
-            buttonsContainer.remove();
-        }
-        
-        // Create a temporary container for PDF generation
+        if (buttonsContainer) buttonsContainer.remove();
         const tempContainer = document.createElement('div');
         tempContainer.style.position = 'absolute';
         tempContainer.style.left = '-9999px';
         tempContainer.appendChild(element);
         document.body.appendChild(tempContainer);
-        
         const opt = {
             filename: 'clinical_report.pdf',
             margin: 10,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2,
-                logging: true,
-                useCORS: true,
-                allowTaint: true,
-                scrollX: 0,
-                scrollY: 0
-            },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait' 
-            }
+            html2canvas: { scale: 2, logging: true, useCORS: true, allowTaint: true, scrollX: 0, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-
-        // Generate PDF
-        html2pdf()
-            .set(opt)
-            .from(element)
-            .save()
-            .then(() => {
-                // Clean up
-                tempContainer.remove();
-            })
-            .catch(err => {
-                console.error('PDF generation failed:', err);
-                tempContainer.remove();
-            });
+        html2pdf().set(opt).from(element).save().then(() => { tempContainer.remove(); }).catch(err => { console.error('PDF generation failed:', err); tempContainer.remove(); });
     }
 </script>
 
 {% endblock %}
 
 {% block styles %}
-
 <style>
     .probability-meter {
         height: 30px;
@@ -163,6 +162,7 @@
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
+        transition: width 1s ease-in-out; /* Smooth bar animation */
     }
     .diagnosis-card.malignant {
         border-left: 4px solid #dc3545;
